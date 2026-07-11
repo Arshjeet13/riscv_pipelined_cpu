@@ -1,4 +1,5 @@
 #include "cpu.hpp"
+#include "handlers.hpp"
 #include <iostream>
 #include <sys/mman.h>
 #include <cstdio>
@@ -59,4 +60,8 @@ void CPU::run(){
     // update pc (sequential, branch, jump)
 
     // repeat until halt condition
+}
+
+void decode(){
+
 }
