@@ -29,21 +29,28 @@ namespace isa
 
     namespace I
     {
-        void addi  (uint32_t instruction, uint32_t* registers);
-        void xori_ (uint32_t instruction, uint32_t* registers);
-        void ori_  (uint32_t instruction, uint32_t* registers);
-        void andi_ (uint32_t instruction, uint32_t* registers);
-        void slli  (uint32_t instruction, uint32_t* registers);
-        void srli  (uint32_t instruction, uint32_t* registers);
-        void srai  (uint32_t instruction, uint32_t* registers);
-        void slti  (uint32_t instruction, uint32_t* registers);
-        void sltiu (uint32_t instruction, uint32_t* registers);
-        void lb    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void lh    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void lw    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void lbu   (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void lhu   (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void jalr  (uint32_t instruction, uint32_t* registers, uint32_t& pc);
+
+        int get_source_register     (uint32_t instruction);
+        int get_destination_register(uint32_t instruction);
+
+        void addi  (int rs1, int imm, int rd, uint32_t* registers);
+        void subi  (int rs1, int imm, int rd, uint32_t* registers);
+        void xori_ (int rs1, int imm, int rd, uint32_t* registers);
+        void ori_  (int rs1, int imm, int rd, uint32_t* registers);
+        void andi_ (int rs1, int imm, int rd, uint32_t* registers);
+        void slli  (int rs1, int imm, int rd, uint32_t* registers);
+        void srli  (int rs1, int imm, int rd, uint32_t* registers);
+        void srai  (int rs1, int imm, int rd, uint32_t* registers);
+        void slti  (int rs1, int imm, int rd, uint32_t* registers);
+        void sltui (int rs1, int imm, int rd, uint32_t* registers);
+        void lb    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lh    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lw    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lbu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lhu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        void jalr  (         int imm, int rd, uint32_t* registers, uint32_t& pc);
+
+        void handle_I_type_instr(uint32_t instruction, uint32_t* registers);
     }
 
     namespace S

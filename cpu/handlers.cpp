@@ -2,11 +2,6 @@
 
 namespace isa
 {
-
-    // Extracts bits [l:r] (inclusive) from instruction as a plain integer.
-    // Shift-then-mask, with width computed explicitly, so the l == 31 case
-    // (funct7) never has to compute 1 << 32 -- that shift amount equals the
-    // type's bit width and is undefined behavior in C++.
     int extract_bits(int l, int r, uint32_t instruction){
         int width = l - r + 1;
         uint32_t mask = (width >= 32) ? 0xFFFFFFFFu : ((1u << width) - 1u);
