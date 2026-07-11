@@ -1,22 +1,30 @@
+#pragma once
 #include <cstdint>
+#include <utility>
 
 namespace isa
 {
 
-    void writeRegister(uint32_t* registers, int rd, uint32_t result);
+    int extract_bits(int l, int r, uint32_t instruction);
+    void writeRegister(uint32_t result, int rd, uint32_t* registers);
 
     namespace R
     {
-        void add   (uint32_t instruction, uint32_t* registers);
-        void sub   (uint32_t instruction, uint32_t* registers);
-        void xor_  (uint32_t instruction, uint32_t* registers);
-        void or_   (uint32_t instruction, uint32_t* registers);
-        void and_  (uint32_t instruction, uint32_t* registers);
-        void sll   (uint32_t instruction, uint32_t* registers);
-        void srl   (uint32_t instruction, uint32_t* registers);
-        void sra   (uint32_t instruction, uint32_t* registers);
-        void slt   (uint32_t instruction, uint32_t* registers);
-        void sltu  (uint32_t instruction, uint32_t* registers);
+        std::pair<int,int> get_source_registers(uint32_t instruction);
+        int get_destination_register(uint32_t instruction);
+
+        void add   (int rs1, int rs2, int rd, uint32_t* registers);
+        void sub   (int rs1, int rs2, int rd, uint32_t* registers);
+        void xor_  (int rs1, int rs2, int rd, uint32_t* registers);
+        void or_   (int rs1, int rs2, int rd, uint32_t* registers);
+        void and_  (int rs1, int rs2, int rd, uint32_t* registers);
+        void sll   (int rs1, int rs2, int rd, uint32_t* registers);
+        void srl   (int rs1, int rs2, int rd, uint32_t* registers);
+        void sra   (int rs1, int rs2, int rd, uint32_t* registers);
+        void slt   (int rs1, int rs2, int rd, uint32_t* registers);
+        void sltu  (int rs1, int rs2, int rd, uint32_t* registers);
+
+        void handle_R_type_instr(uint32_t instruction, uint32_t* registers);
     }
 
     namespace I
