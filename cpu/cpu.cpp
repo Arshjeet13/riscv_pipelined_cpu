@@ -62,19 +62,19 @@ void CPU::run(){
     // repeat until halt condition
 }
 
-void fetch(){
+void CPU::fetch(){
+    
+}
+
+void CPU::decode(){
 
 }
 
-void decode(){
+void CPU::execute(){
 
 }
 
-void execute(){
-
-}
-
-void update_pc(){
+void CPU::update_pc(){
 
 }
 

@@ -15,6 +15,14 @@ public:
     // The fetch-decode-execute loop. Runs until a halt condition is reached.
     void run();
 
+    void fetch();
+
+    void decode();
+
+    void execute();
+
+    void update_pc();
+
 private:
     uint8_t* memory {nullptr};
     uint32_t registers[32] = {};
