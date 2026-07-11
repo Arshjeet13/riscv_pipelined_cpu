@@ -62,6 +62,20 @@ void CPU::run(){
     // repeat until halt condition
 }
 
+void fetch(){
+
+}
+
 void decode(){
 
 }
+
+void execute(){
+
+}
+
+void update_pc(){
+
+}
+
+
