@@ -16,8 +16,8 @@ public:
     void run();
 
 private:
-    uint8_t* memory = nullptr;
+    uint8_t* memory {nullptr};
     uint32_t registers[32] = {};
-    uint32_t pc = 0;
+    uint32_t pc {0};
 };
 
