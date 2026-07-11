@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sys/mman.h>
 #include <cstdio>
+#include <cstring>
 
 void CPU::reset(){
     const size_t SIZE = 4ULL * 1024 * 1024 * 1024; // 4GB
@@ -35,10 +36,17 @@ void CPU::reset(){
 }
 
 void CPU::loadProgram(const char* path){
-    // read the hex file at path
+    freopen(path, "r", stdin);
 
-    // write each decoded instruction word into memory, starting at
-    // the address pc was reset to
+    uint32_t instruction_addr = pc;
+
+    std::string instruction_text;
+
+    while(getline(std::cin, instruction_text)){
+        uint32_t instruction = stoi(instruction_text);
+        memcpy(&memory[instruction_addr], &instruction, 4);
+        instruction_addr += 4;
+    }
 }
 
 void CPU::run(){
