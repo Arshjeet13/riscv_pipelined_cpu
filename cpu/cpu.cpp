@@ -54,16 +54,19 @@ void CPU::loadProgram(const char* path){
 
 void CPU::run(){
     while(pc <= last_instruction_addr){
+        uint32_t saved_pc = pc;
         uint32_t instruction = fetch();
         uint8_t opcode = decode(instruction);
         execute(instruction, opcode);
+        if(pc == saved_pc){
+            update_pc();
+        }
     }
 }
 
 uint32_t CPU::fetch(){
     uint32_t instruction;
     memcpy(&instruction, &memory[pc], sizeof(instruction));
-    update_pc();
     return instruction;
 }
 
