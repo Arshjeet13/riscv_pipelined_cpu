@@ -26,11 +26,11 @@ namespace isa
         return rd;
     }
     uint16_t get_funct_3        (uint32_t instruction){
-        uint16_t funct_3 {static_cast<uint16_t>(14, 12, instruction)};
+        uint16_t funct_3 {static_cast<uint16_t> (extract_bits(14, 12, instruction))};
         return funct_3;
     }
     uint16_t get_funct_7        (uint32_t instruction){
-        uint16_t funct_7 {static_cast<uint16_t>(31, 25, instruction)};
+        uint16_t funct_7 {static_cast<uint16_t> (extract_bits(31, 25, instruction))};
         return funct_7;
     }
 
@@ -389,7 +389,96 @@ namespace isa
 
     namespace B
     {
+        const uint16_t BEQ  {0x00};
+        const uint16_t BNE  {0x01};
+        const uint16_t BLT  {0x04};
+        const uint16_t BGE  {0x05};
+        const uint16_t BLTU {0x06};
+        const uint16_t BGEU {0x07};
 
+        uint32_t get_imm (uint32_t instruction){
+            uint32_t bit_12   = extract_bits(31, 31, instruction) << 12;
+            uint32_t bit_11   = extract_bits(7,   7, instruction) <<  7;
+            uint32_t bit_10_5 = extract_bits(30, 25, instruction) <<  5;
+            uint32_t bit_4_1  = extract_bits(11,  8, instruction) <<  1;
+            int32_t imm = static_cast<int32_t> ((bit_12 | bit_11 | bit_10_5 | bit_4_1) << 19) >> 19;
+            return static_cast<uint32_t> (imm);
+        }
+
+        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
+            int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
+
+            if (rs1_val == rs2_val) {
+                pc += imm;
+            }
+        }
+        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
+            int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
+
+            if (rs1_val != rs2_val) {
+                pc += imm;
+            }
+        }
+        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
+            int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
+
+            if (rs1_val < rs2_val) {
+                pc += imm;
+            }
+        }
+        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
+            int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
+
+            if (rs1_val >= rs2_val) {
+                pc += imm;
+            }
+        }
+        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            if (registers[rs1] < registers[rs2]) {
+                pc += imm;
+            }
+        }
+        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+            if (registers[rs1] >= registers[rs2]) {
+                pc += imm;
+            }
+        }
+
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+            int rs1 {get_source_register_1(instruction)};
+            int rs2 {get_source_register_2(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            uint16_t code {get_funct_3(instruction)};
+
+            switch (code)
+            {
+            case BEQ:
+                beq(rs1, rs2, imm, registers, pc);
+                break;
+            case BNE:
+                bne(rs1, rs2, imm, registers, pc);
+                break;
+            case BLT:
+                blt(rs1, rs2, imm, registers, pc);
+                break;
+            case BGE:
+                bge(rs1, rs2, imm, registers, pc);
+                break;
+            case BLTU:
+                bltu(rs1, rs2, imm, registers, pc);
+                break;
+            case BGEU:
+                bgeu(rs1, rs2, imm, registers, pc);
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     namespace J
