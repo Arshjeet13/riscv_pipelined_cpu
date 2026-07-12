@@ -44,7 +44,7 @@ void CPU::loadProgram(const char* path){
     std::string instruction_text;
 
     while(getline(std::cin, instruction_text)){
-        uint32_t instruction = stoi(instruction_text);
+        uint32_t instruction = stoul(instruction_text, nullptr, 16);
         memcpy(&memory[instruction_addr], &instruction, 4);
         instruction_addr += 4;
     }
