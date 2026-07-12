@@ -52,8 +52,10 @@ void CPU::loadProgram(const char* path){
 
 void CPU::run(){
     // fetch the instruction at pc
+    uint32_t instruction = fetch();
 
     // decode it
+
 
     // execute it
 
@@ -62,16 +64,50 @@ void CPU::run(){
     // repeat until halt condition
 }
 
-void CPU::fetch(){
-    
+uint32_t CPU::fetch(){
+    uint32_t instruction;
+    memcpy(&instruction, &memory[pc], sizeof(instruction));
+    return instruction;
 }
 
-void CPU::decode(){
-
+void CPU::decode(uint32_t instruction){
+    uint8_t opcode = isa::get_opcode(instruction);
+    execute(instruction, opcode);
 }
 
-void CPU::execute(){
-
+void CPU::execute(uint32_t instruction, uint8_t opcode){
+    switch (opcode)
+    {
+    case isa::op_R:
+        isa::R::handle_instr(instruction, registers);
+        break;
+    case isa::op_I_IMM:
+        isa::I_IMM::handle_instr(instruction, registers);
+        break;
+    case isa::op_I_MEM:
+        isa::I_MEM::handle_instr(instruction, registers, memory);
+        break;
+    case isa::op_I_JMP:
+        isa::I_JMP::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_S:
+        isa::S::handle_instr(instruction, registers, memory);
+        break;
+    case isa::op_B:
+        isa::B::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_J:
+        isa::J::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_U1:
+        isa::U::handle_instr(instruction, registers, pc, opcode);
+        break;
+    case isa::op_U2:
+        isa::U::handle_instr(instruction, registers, pc, opcode);
+        break;
+    default:
+        break;
+    }
 }
 
 void CPU::update_pc(){
