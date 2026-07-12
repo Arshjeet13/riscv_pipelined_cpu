@@ -41,7 +41,7 @@ namespace isa
         void srai  (int rs1, uint32_t imm, int rd, uint32_t* registers);
         void slti  (int rs1, uint32_t imm, int rd, uint32_t* registers);
         void sltiu (int rs1, uint32_t imm, int rd, uint32_t* registers);
-        void handle_instr(uint32_t instruction, uint32_t* registers);
+        void handle_instr   (uint32_t instruction, uint32_t* registers);
     }
 
     namespace I_MEM
@@ -52,7 +52,14 @@ namespace isa
         void lw    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
         void lbu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
         void lhu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
+        void handle_instr    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
+    }
+
+    namespace I_JMP
+    {
+        uint32_t get_imm(uint32_t instruction);
+        void jalr   (int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc);
     }
 
     namespace S
@@ -61,7 +68,7 @@ namespace isa
         void sb    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
         void sh    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
         void sw    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
+        void handle_instr     (uint32_t instruction, uint32_t* registers, uint8_t* memory);
     }
 
     namespace B
@@ -73,7 +80,7 @@ namespace isa
         void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
         void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
         void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t&  pc);
+        void handle_instr     (uint32_t instruction, uint32_t* registers, uint32_t&  pc);
     }
 
     namespace J

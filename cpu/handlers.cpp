@@ -337,6 +337,30 @@ namespace isa
         }
     }
 
+    namespace I_JMP
+    {
+        uint32_t get_imm(uint32_t instruction){
+            uint32_t raw{extract_bits(31, 20, instruction)};
+            int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
+            return static_cast<uint32_t>(imm);
+        }
+
+        void jalr   (int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc){
+            writeRegister(pc + 4, rd, registers);
+            pc = (registers[rs1] + imm) & ~1u; // spec requires clearing bit 0 of target
+                                               // This is mentioned in riscv unpriveleged isa spec, 
+                                               // not in the condensed manual
+        }
+
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+            int rs1      {get_source_register_1(instruction)};
+            int rd       {get_destination_register(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            jalr(rs1, rd, imm, registers, pc);
+        }
+    }
+
     namespace S
     {
         const uint16_t SB {0x00};
