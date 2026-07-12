@@ -78,13 +78,16 @@ namespace isa
 
     namespace J
     {
+        uint32_t get_imm(uint32_t instruction);
         void jal   (int rd, uint32_t imm, uint32_t& pc);
         void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc);
     }
 
     namespace U
     {
-        void lui   (uint32_t instruction, uint32_t* registers);
-        void auipc (uint32_t instruction, uint32_t* registers, uint32_t pc);
+        uint32_t get_imm(uint32_t instruction);        
+        void lui   (int rd, uint32_t imm, uint32_t* registers);
+        void auipc (int rd, uint32_t imm, uint32_t* registers, uint32_t pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t pc, uint8_t opcode);
     }
 }

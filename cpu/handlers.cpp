@@ -507,6 +507,37 @@ namespace isa
 
     namespace U
     {
-       
+        // NOTE : These fields store opcodes, and not funct_3 / funct_7 / both, since 
+        //        there are only 2 U type instructions, both with different opcodes
+        const uint8_t LUI   {0b0110111};
+        const uint8_t AUIPC {0b0010111};
+
+        uint32_t get_imm(uint32_t instruction){
+            uint32_t raw {extract_bits(31, 12, instruction)};
+            return raw;
+        } 
+        void lui   (int rd, uint32_t imm, uint32_t* registers){
+            writeRegister(imm << 12, rd, registers);
+        }
+        void auipc (int rd, uint32_t imm, uint32_t* registers, uint32_t pc){
+            writeRegister(pc + (imm << 12), rd, registers);
+        }
+
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t pc, uint8_t opcode){
+            int rd {get_destination_register(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            switch (opcode)
+            {
+            case LUI:
+                lui(rd, imm, registers);
+                break;
+            case AUIPC:
+                auipc(rd, imm, registers, pc);   
+                break;         
+            default:
+                break;
+            }
+        }
     }
 }
