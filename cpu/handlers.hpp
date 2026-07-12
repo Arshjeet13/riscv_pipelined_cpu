@@ -10,7 +10,6 @@ namespace isa
     int get_source_register_1   (uint32_t instruction);
     int get_source_register_2   (uint32_t instruction);
     int get_destination_register(uint32_t instruction);
-    uint32_t get_imm            (uint32_t instruction);
 
     namespace R
     {
@@ -30,34 +29,37 @@ namespace isa
 
     namespace I_IMM
     {
-        void addi  (int rs1, int imm, int rd, uint32_t* registers);
-        void xori_ (int rs1, int imm, int rd, uint32_t* registers);
-        void ori_  (int rs1, int imm, int rd, uint32_t* registers);
-        void andi_ (int rs1, int imm, int rd, uint32_t* registers);
-        void slli  (int rs1, int imm, int rd, uint32_t* registers);
-        void srli  (int rs1, int imm, int rd, uint32_t* registers);
-        void srai  (int rs1, int imm, int rd, uint32_t* registers);
-        void slti  (int rs1, int imm, int rd, uint32_t* registers);
-        void sltiu (int rs1, int imm, int rd, uint32_t* registers);
-
+        uint32_t get_imm (uint32_t instruction);
+        void addi  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void xori_ (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void ori_  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void andi_ (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void slli  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void srli  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void srai  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void slti  (int rs1, uint32_t imm, int rd, uint32_t* registers);
+        void sltiu (int rs1, uint32_t imm, int rd, uint32_t* registers);
         void handle_instr(uint32_t instruction, uint32_t* registers);
     }
 
     namespace I_MEM
     {
-        void lb    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lh    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lw    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lbu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lhu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
+        uint32_t get_imm (uint32_t instruction);
+        void lb    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lh    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lw    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lbu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
+        void lhu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
         void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
     }
 
     namespace S
     {
-        void sb    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void sh    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
-        void sw    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
+        uint32_t get_imm (uint32_t instruction);
+        void sb    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
+        void sh    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
+        void sw    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
     }
 
     namespace B

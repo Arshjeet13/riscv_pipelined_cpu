@@ -25,11 +25,6 @@ namespace isa
         int rd{static_cast<int>(extract_bits(11, 7, instruction))};
         return rd;
     }
-    uint32_t get_imm(uint32_t instruction){
-        uint32_t raw{extract_bits(31, 20, instruction)};
-        int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
-        return static_cast<uint32_t>(imm);
-    }
 
     namespace R
     {
@@ -154,43 +149,49 @@ namespace isa
         const uint16_t SLTI  {0x02};
         const uint16_t SLTIU {0x03};
 
-        void addi  (int rs1, int imm, int rd, uint32_t* registers){
+        uint32_t get_imm(uint32_t instruction){
+            uint32_t raw{extract_bits(31, 20, instruction)};
+            int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
+            return static_cast<uint32_t>(imm);
+        }
+
+        void addi  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister(rs1_val + imm, rd, registers);
         }
-        void xori_ (int rs1, int imm, int rd, uint32_t* registers){
+        void xori_ (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister(rs1_val ^ imm, rd, registers);
         }
-        void ori_  (int rs1, int imm, int rd, uint32_t* registers){
+        void ori_  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister(rs1_val | imm, rd, registers);
         }
-        void andi_ (int rs1, int imm, int rd, uint32_t* registers){
+        void andi_ (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister(rs1_val & imm, rd, registers);
         }
-        void slli  (int rs1, int imm, int rd, uint32_t* registers){
+        void slli  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             uint32_t shamt = imm & 0x1F;
             writeRegister(rs1_val << shamt, rd, registers);
         }
-        void srli  (int rs1, int imm, int rd, uint32_t* registers){
+        void srli  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             uint32_t shamt = imm & 0x1F;
             writeRegister(rs1_val >> shamt, rd, registers);
         }
-        void srai  (int rs1, int imm, int rd, uint32_t* registers){
+        void srai  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             int32_t rs1_val = static_cast<int32_t>(registers[rs1]); 
             uint32_t shamt = imm & 0x1F;
             writeRegister(static_cast<uint32_t>(rs1_val >> shamt), rd, registers);
         }
-        void slti  (int rs1, int imm, int rd, uint32_t* registers){
+        void slti  (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             int32_t rs1_val = static_cast<int32_t>(registers[rs1]);
             int32_t imm_val = static_cast<int32_t>(imm);
             writeRegister((rs1_val < imm_val) ? 1 : 0, rd, registers);
         }
-        void sltiu (int rs1, int imm, int rd, uint32_t* registers){
+        void sltiu (int rs1,  uint32_t imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister((rs1_val < static_cast<uint32_t>(imm)) ? 1 : 0, rd, registers);
         }
@@ -259,6 +260,12 @@ namespace isa
         const uint16_t LBU {0x04};
         const uint16_t LHU {0x05};
 
+        uint32_t get_imm(uint32_t instruction){
+            uint32_t raw{extract_bits(31, 20, instruction)};
+            int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
+            return static_cast<uint32_t>(imm);
+        }
+
         void lb    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
             uint32_t addr = registers[rs1] + imm;
             int8_t  data;
@@ -324,7 +331,52 @@ namespace isa
 
     namespace S
     {
-    
+        const uint16_t SB {0x00};
+        const uint16_t SH {0x01};
+        const uint16_t SW {0x02};
+
+        uint32_t get_imm(uint32_t instruction){
+            uint32_t raw1{extract_bits(31, 25, instruction)};
+            uint32_t raw2{extract_bits(11,  7, instruction)};
+            int32_t imm = static_cast<int32_t>(((raw1 << 5) | raw2) << 20) >> 20;
+            return static_cast<uint32_t>(imm);
+        }
+        
+        void sb    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            uint8_t  data = static_cast<uint8_t> (registers[rs2]);
+            memcpy(memory + addr, &data, sizeof(data));         
+        }
+        void sh    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            uint16_t  data = static_cast<uint16_t> (registers[rs2]);
+            memcpy(memory + addr, &data, sizeof(data));      
+        }
+        void sw    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            uint32_t  data = static_cast<uint32_t> (registers[rs2]);
+            memcpy(memory + addr, &data, sizeof(data));      
+        }
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory){
+            int rs1      {get_source_register_1(instruction)};
+            int rs2      {get_source_register_2(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            uint16_t code = static_cast<uint16_t> (extract_bits(14, 12, instruction));
+
+            switch (code)
+            {
+            case SB:
+                sb(rs1, rs2, imm, registers, memory);
+                break;
+            case SH:
+                sh(rs1, rs2, imm, registers, memory);
+                break;
+            case SW:
+                sw(rs1, rs2, imm, registers, memory);
+                break;
+            }   
+        }
     }
 
     namespace B
