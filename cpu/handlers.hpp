@@ -64,12 +64,14 @@ namespace isa
 
     namespace B
     {
-        void beq   (uint32_t instruction, uint32_t* registers, uint32_t& pc);
-        void bne   (uint32_t instruction, uint32_t* registers, uint32_t& pc);
-        void blt   (uint32_t instruction, uint32_t* registers, uint32_t& pc);
-        void bge   (uint32_t instruction, uint32_t* registers, uint32_t& pc);
-        void bltu  (uint32_t instruction, uint32_t* registers, uint32_t& pc);
-        void bgeu  (uint32_t instruction, uint32_t* registers, uint32_t& pc);
+        uint32_t get_imm (uint32_t instruction);\
+        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
     }
 
     namespace J
