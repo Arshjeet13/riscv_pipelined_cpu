@@ -5,11 +5,12 @@
 namespace isa
 {
 
-    uint32_t extract_bits(int l, int r, uint32_t instruction);
+    uint32_t extract_bits(int l, int r, uint32_t data);
     void writeRegister(uint32_t result, int rd, uint32_t* registers);
     int get_source_register_1   (uint32_t instruction);
     int get_source_register_2   (uint32_t instruction);
     int get_destination_register(uint32_t instruction);
+    uint32_t get_imm            (uint32_t instruction);
 
     namespace R
     {
@@ -29,8 +30,6 @@ namespace isa
 
     namespace I_IMM
     {
-        uint32_t get_imm(uint32_t instruction);
-
         void addi  (int rs1, int imm, int rd, uint32_t* registers);
         void xori_ (int rs1, int imm, int rd, uint32_t* registers);
         void ori_  (int rs1, int imm, int rd, uint32_t* registers);
@@ -51,7 +50,7 @@ namespace isa
         void lw    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
         void lbu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
         void lhu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void jalr  (int rs1, int imm, int rd, uint32_t* registers, uint32_t& pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory);
     }
 
     namespace S

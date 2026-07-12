@@ -1,18 +1,18 @@
 #include "handlers.hpp"
+#include <cstring>
+#include <cstdint>
 
 namespace isa
 {
-    uint32_t extract_bits(int l, int r, uint32_t instruction){
+    uint32_t extract_bits(int l, int r, uint32_t data){
         int width = l - r + 1;
         uint32_t mask = (width >= 32) ? 0xFFFFFFFFu : ((1u << width) - 1u);
-        return ((instruction >> r) & mask);
+        return ((data >> r) & mask);
     }
-
     void writeRegister(uint32_t result, int rd, uint32_t* registers){
         if(rd == 0) return;
         registers[rd] = result;
     }
-
     int get_source_register_1(uint32_t instruction){
         int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
         return rs1;
@@ -24,6 +24,11 @@ namespace isa
     int get_destination_register(uint32_t instruction){
         int rd{static_cast<int>(extract_bits(11, 7, instruction))};
         return rd;
+    }
+    uint32_t get_imm(uint32_t instruction){
+        uint32_t raw{extract_bits(31, 20, instruction)};
+        int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
+        return static_cast<uint32_t>(imm);
     }
 
     namespace R
@@ -149,16 +154,6 @@ namespace isa
         const uint16_t SLTI  {0x02};
         const uint16_t SLTIU {0x03};
 
-        uint32_t get_imm(uint32_t instruction){
-            uint32_t raw{extract_bits(31, 20, instruction)};
-            // raw is a 12-bit field sitting in the low bits. Shifting it up so its
-            // own bit 11 lands on bit 31 (the sign position of a 32-bit word), then
-            // arithmetic-shifting back down, sign-extends it -- same arithmetic-shift
-            // behavior already relied on in R::sra.
-            int32_t imm = static_cast<int32_t>(raw << 20) >> 20;
-            return static_cast<uint32_t>(imm);
-        }
-
         void addi  (int rs1, int imm, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
             writeRegister(rs1_val + imm, rd, registers);
@@ -258,12 +253,73 @@ namespace isa
 
     namespace I_MEM
     {
-        void lb    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lh    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lw    (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lbu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lhu   (int rs1, int imm, int rd, uint32_t* registers, uint8_t* memory);
-        void jalr  (int rs1, int imm, int rd, uint32_t* registers, uint32_t& pc);
+        const uint16_t LB  {0x00};
+        const uint16_t LH  {0x01};
+        const uint16_t LW  {0x02};
+        const uint16_t LBU {0x04};
+        const uint16_t LHU {0x05};
+
+        void lb    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            int8_t  data;
+            memcpy(&data, memory + addr, sizeof(data));
+            uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
+            writeRegister(result, rd, registers);
+        }
+        void lh    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            int16_t  data;
+            memcpy(&data, memory + addr, sizeof(data));
+            uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
+            writeRegister(result, rd, registers);
+        }
+        void lw    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            int32_t  data;
+            memcpy(&data, memory + addr, sizeof(data));
+            uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
+            writeRegister(result, rd, registers);
+        }
+        void lbu   (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            uint8_t  data;
+            memcpy(&data, memory + addr, sizeof(data));
+            uint32_t result = static_cast<uint32_t>(data);
+            writeRegister(result, rd, registers);
+        }
+        void lhu   (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+            uint32_t addr = registers[rs1] + imm;
+            uint16_t  data;
+            memcpy(&data, memory + addr, sizeof(data));
+            uint32_t result = static_cast<uint32_t>(data);
+            writeRegister(result, rd, registers);
+        }
+
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory){
+            int rs1      {get_source_register_1(instruction)};
+            int rd       {get_destination_register(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            uint16_t code = static_cast<uint16_t> (extract_bits(14, 12, instruction));
+
+            switch (code) {
+                case LB :
+                    lb (rs1, imm, rd, registers, memory);
+                    break;
+                case LH :
+                    lh (rs1, imm, rd, registers, memory);
+                    break;
+                case LW :
+                    lw (rs1, imm, rd, registers, memory);
+                    break;
+                case LBU:
+                    lbu(rs1, imm, rd, registers, memory);
+                    break;
+                case LHU:
+                    lhu(rs1, imm, rd, registers, memory);
+                    break;
+            }
+        }
     }
 
     namespace S
