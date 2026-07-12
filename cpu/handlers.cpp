@@ -13,6 +13,10 @@ namespace isa
         if(rd == 0) return;
         registers[rd] = result;
     }
+    uint8_t get_opcode(uint32_t instruction){
+        uint8_t opcode {static_cast<uint8_t> (extract_bits(6, 0, instruction))};
+        return opcode;
+    }
     int get_source_register_1   (uint32_t instruction){
         int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
         return rs1;
