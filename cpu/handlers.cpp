@@ -483,7 +483,26 @@ namespace isa
 
     namespace J
     {
-         
+        uint32_t get_imm (uint32_t instruction){
+            uint32_t bit_20   = extract_bits(31, 31, instruction) << 20;
+            uint32_t bit_10_1 = extract_bits(30, 21, instruction) <<  1;
+            uint32_t bit_11 = extract_bits(20, 20, instruction) << 11;
+            uint32_t bit_19_12  = extract_bits(19, 12, instruction) << 12;
+
+            int32_t imm = static_cast<int32_t> ((bit_20 | bit_19_12 | bit_11 | bit_10_1) << 11) >> 11;
+            return static_cast<uint32_t> (imm);
+        }
+
+        void jal   (int rd, uint32_t imm, uint32_t *registers, uint32_t& pc){
+            writeRegister(pc + 4, rd, registers);  
+            pc += imm;          
+        }
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+            int rd {get_destination_register(instruction)};
+            uint32_t imm {get_imm(instruction)};
+
+            jal(rd, imm, registers, pc);
+        }
     }
 
     namespace U

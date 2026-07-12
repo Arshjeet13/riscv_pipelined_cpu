@@ -78,7 +78,8 @@ namespace isa
 
     namespace J
     {
-        void jal   (uint32_t instruction, uint32_t* registers, uint32_t& pc);
+        void jal   (int rd, uint32_t imm, uint32_t& pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc);
     }
 
     namespace U
