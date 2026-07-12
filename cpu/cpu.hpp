@@ -12,12 +12,12 @@ public:
     // pc was reset to.
     void loadProgram(const char* path);
 
-    // The fetch-decode-execute loop. Runs until a halt condition is reached.
+    // The fetch decode execute loop. It will runs until all instructions are processed.
     void run();
 
     uint32_t fetch();
 
-    void decode(uint32_t instruction);
+    uint8_t decode(uint32_t instruction);
 
     void execute(uint32_t instruction, uint8_t opcode);
 
@@ -27,5 +27,6 @@ private:
     uint8_t* memory {nullptr};
     uint32_t registers[32] = {};
     uint32_t pc {0};
+    uint32_t last_instruction_addr {0};
 };
 

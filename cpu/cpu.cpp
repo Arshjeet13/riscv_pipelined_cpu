@@ -48,31 +48,32 @@ void CPU::loadProgram(const char* path){
         memcpy(&memory[instruction_addr], &instruction, 4);
         instruction_addr += 4;
     }
+
+    last_instruction_addr = instruction_addr - 4;
 }
 
 void CPU::run(){
-    // fetch the instruction at pc
-    uint32_t instruction = fetch();
-
-    // decode it
-
-
-    // execute it
-
-    // update pc (sequential, branch, jump)
-
-    // repeat until halt condition
+    while(pc <= last_instruction_addr){
+        uint32_t instruction = fetch();
+        uint8_t opcode = decode(instruction);
+        execute(instruction, opcode);
+    }
 }
 
 uint32_t CPU::fetch(){
     uint32_t instruction;
     memcpy(&instruction, &memory[pc], sizeof(instruction));
+    update_pc();
     return instruction;
 }
 
-void CPU::decode(uint32_t instruction){
+void CPU::update_pc(){
+    pc += 4;
+}
+
+uint8_t CPU::decode(uint32_t instruction){
     uint8_t opcode = isa::get_opcode(instruction);
-    execute(instruction, opcode);
+    return opcode;
 }
 
 void CPU::execute(uint32_t instruction, uint8_t opcode){
@@ -109,9 +110,3 @@ void CPU::execute(uint32_t instruction, uint8_t opcode){
         break;
     }
 }
-
-void CPU::update_pc(){
-
-}
-
-
