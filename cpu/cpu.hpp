@@ -15,11 +15,11 @@ public:
     // The fetch-decode-execute loop. Runs until a halt condition is reached.
     void run();
 
-    void fetch();
+    uint32_t fetch();
 
-    void decode();
+    void decode(uint32_t instruction);
 
-    void execute();
+    void execute(uint32_t instruction, uint8_t opcode);
 
     void update_pc();
 
