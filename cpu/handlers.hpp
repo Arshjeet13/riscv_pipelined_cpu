@@ -7,12 +7,12 @@ namespace isa
 
     uint32_t extract_bits(int l, int r, uint32_t instruction);
     void writeRegister(uint32_t result, int rd, uint32_t* registers);
+    int get_source_register_1   (uint32_t instruction);
+    int get_source_register_2   (uint32_t instruction);
+    int get_destination_register(uint32_t instruction);
 
     namespace R
     {
-        std::pair<int,int> get_source_registers(uint32_t instruction);
-        int get_destination_register(uint32_t instruction);
-
         void add   (int rs1, int rs2, int rd, uint32_t* registers);
         void sub   (int rs1, int rs2, int rd, uint32_t* registers);
         void xor_  (int rs1, int rs2, int rd, uint32_t* registers);
@@ -24,13 +24,11 @@ namespace isa
         void slt   (int rs1, int rs2, int rd, uint32_t* registers);
         void sltu  (int rs1, int rs2, int rd, uint32_t* registers);
 
-        void handle_R_type_instr(uint32_t instruction, uint32_t* registers);
+        void handle_instr(uint32_t instruction, uint32_t* registers);
     }
 
     namespace I_IMM
     {
-        int get_source_register     (uint32_t instruction);
-        int get_destination_register(uint32_t instruction);
         uint32_t get_imm(uint32_t instruction);
 
         void addi  (int rs1, int imm, int rd, uint32_t* registers);
@@ -43,7 +41,7 @@ namespace isa
         void slti  (int rs1, int imm, int rd, uint32_t* registers);
         void sltiu (int rs1, int imm, int rd, uint32_t* registers);
 
-        void handle_I_type_instr(uint32_t instruction, uint32_t* registers);
+        void handle_instr(uint32_t instruction, uint32_t* registers);
     }
 
     namespace I_MEM

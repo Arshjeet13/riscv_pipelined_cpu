@@ -13,6 +13,19 @@ namespace isa
         registers[rd] = result;
     }
 
+    int get_source_register_1(uint32_t instruction){
+        int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
+        return rs1;
+    }
+    int get_source_register_2(uint32_t instruction){
+        int rs2{static_cast<int>(extract_bits(24, 20, instruction))};
+        return rs2;
+    }
+    int get_destination_register(uint32_t instruction){
+        int rd{static_cast<int>(extract_bits(11, 7, instruction))};
+        return rd;
+    }
+
     namespace R
     {
         const uint16_t ADD  {0x0000};
@@ -25,16 +38,6 @@ namespace isa
         const uint16_t SRA  {0x0520};
         const uint16_t SLT  {0x0200};
         const uint16_t SLTU {0x0300};
-
-        std::pair<int,int> get_source_registers(uint32_t instruction){
-            int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
-            int rs2{static_cast<int>(extract_bits(24, 20, instruction))};
-            return {rs1, rs2};
-        }
-        int get_destination_register(uint32_t instruction){
-            int rd{static_cast<int>(extract_bits(11, 7, instruction))};
-            return rd;
-        }
 
         void add   (int rs1, int rs2, int rd, uint32_t* registers){
             uint32_t rs1_val = registers[rs1];
@@ -87,8 +90,9 @@ namespace isa
             writeRegister((rs1_val < rs2_val) ? 1 : 0, rd, registers);
         }
 
-        void handle_R_type_instr(uint32_t instruction, uint32_t* registers){
-            auto [rs1, rs2] = get_source_registers(instruction);
+        void handle_instr(uint32_t instruction, uint32_t* registers){
+            int rs1 =        get_source_register_1(instruction);
+            int rs2 =        get_source_register_2(instruction);
             int rd =      get_destination_register(instruction);
 
             uint16_t funct7{static_cast<uint16_t>(extract_bits(31, 25, instruction))};
@@ -145,14 +149,6 @@ namespace isa
         const uint16_t SLTI  {0x02};
         const uint16_t SLTIU {0x03};
 
-        int get_source_register(uint32_t instruction){
-            int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
-            return rs1;
-        }
-        int get_destination_register(uint32_t instruction){
-            int rd{static_cast<int>(extract_bits(11, 7, instruction))};
-            return rd;
-        }
         uint32_t get_imm(uint32_t instruction){
             uint32_t raw{extract_bits(31, 20, instruction)};
             // raw is a 12-bit field sitting in the low bits. Shifting it up so its
@@ -204,10 +200,11 @@ namespace isa
             writeRegister((rs1_val < static_cast<uint32_t>(imm)) ? 1 : 0, rd, registers);
         }
 
-        void handle_I_type_instr(uint32_t instruction, uint32_t* registers){
-            int rs1 =      get_source_register(instruction);
-            int rd =  get_destination_register(instruction);
-            uint32_t imm =             get_imm(instruction);
+        void handle_instr(uint32_t instruction, uint32_t* registers){
+            int rs1 =        get_source_register_1(instruction);
+            int rd =      get_destination_register(instruction);
+
+            uint32_t imm =                 get_imm(instruction);
 
             uint16_t funct3{static_cast<uint16_t>(extract_bits(14, 12, instruction))};
             int code = funct3;
