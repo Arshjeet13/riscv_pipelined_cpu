@@ -4,9 +4,19 @@
 
 namespace isa
 {
+    const uint8_t op_R     {0b0110011};
+    const uint8_t op_I_IMM {0b0010011};
+    const uint8_t op_I_MEM {0b0000011};
+    const uint8_t op_I_JMP {0b1100111};
+    const uint8_t op_S     {0b0100011};
+    const uint8_t op_B     {0b1100011};
+    const uint8_t op_J     {0b1101111};
+    const uint8_t op_U1    {0b0110111};
+    const uint8_t op_U2    {0b0010111};
 
     uint32_t extract_bits(int l, int r, uint32_t data);
     void writeRegister(uint32_t result, int rd, uint32_t* registers);
+    uint8_t get_opcode(uint32_t instruction);
     int get_source_register_1   (uint32_t instruction);
     int get_source_register_2   (uint32_t instruction);
     int get_destination_register(uint32_t instruction);
