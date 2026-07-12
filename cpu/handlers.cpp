@@ -13,17 +13,25 @@ namespace isa
         if(rd == 0) return;
         registers[rd] = result;
     }
-    int get_source_register_1(uint32_t instruction){
+    int get_source_register_1   (uint32_t instruction){
         int rs1{static_cast<int>(extract_bits(19, 15, instruction))};
         return rs1;
     }
-    int get_source_register_2(uint32_t instruction){
+    int get_source_register_2   (uint32_t instruction){
         int rs2{static_cast<int>(extract_bits(24, 20, instruction))};
         return rs2;
     }
     int get_destination_register(uint32_t instruction){
         int rd{static_cast<int>(extract_bits(11, 7, instruction))};
         return rd;
+    }
+    uint16_t get_funct_3        (uint32_t instruction){
+        uint16_t funct_3 {static_cast<uint16_t>(14, 12, instruction)};
+        return funct_3;
+    }
+    uint16_t get_funct_7        (uint32_t instruction){
+        uint16_t funct_7 {static_cast<uint16_t>(31, 25, instruction)};
+        return funct_7;
     }
 
     namespace R
@@ -95,8 +103,8 @@ namespace isa
             int rs2 =        get_source_register_2(instruction);
             int rd =      get_destination_register(instruction);
 
-            uint16_t funct7{static_cast<uint16_t>(extract_bits(31, 25, instruction))};
-            uint16_t funct3{static_cast<uint16_t>(extract_bits(14, 12, instruction))};
+            uint16_t funct7{get_funct_7(instruction)};
+            uint16_t funct3{get_funct_3(instruction)};
             uint16_t code = (funct3 << 8) | funct7;
 
             switch(code)
@@ -202,7 +210,7 @@ namespace isa
 
             uint32_t imm =                 get_imm(instruction);
 
-            uint16_t funct3{static_cast<uint16_t>(extract_bits(14, 12, instruction))};
+            uint16_t funct3{get_funct_3(instruction)};
             int code = funct3;
 
             switch (code)
@@ -307,7 +315,7 @@ namespace isa
             int rd       {get_destination_register(instruction)};
             uint32_t imm {get_imm(instruction)};
 
-            uint16_t code = static_cast<uint16_t> (extract_bits(14, 12, instruction));
+            uint16_t code = get_funct_3(instruction);
 
             switch (code) {
                 case LB :
@@ -362,7 +370,7 @@ namespace isa
             int rs2      {get_source_register_2(instruction)};
             uint32_t imm {get_imm(instruction)};
 
-            uint16_t code = static_cast<uint16_t> (extract_bits(14, 12, instruction));
+            uint16_t code = get_funct_3(instruction);
 
             switch (code)
             {
@@ -381,7 +389,7 @@ namespace isa
 
     namespace B
     {
-        
+
     }
 
     namespace J

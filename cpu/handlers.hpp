@@ -10,6 +10,8 @@ namespace isa
     int get_source_register_1   (uint32_t instruction);
     int get_source_register_2   (uint32_t instruction);
     int get_destination_register(uint32_t instruction);
+    uint16_t get_funct_3        (uint32_t instruction);
+    uint16_t get_funct_7        (uint32_t instruction);
 
     namespace R
     {
