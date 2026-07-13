@@ -349,11 +349,12 @@ namespace isa
             return static_cast<uint32_t>(imm);
         }
 
-        void jalr   (int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void jalr(int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc){
+            uint32_t target = (registers[rs1] + imm) & ~1u;// spec requires clearing bit 0 of target
+                                                           // This is mentioned in riscv unpriveleged isa spec, 
+                                                           // not in the condensed manual
             writeRegister(pc + 4, rd, registers);
-            pc = (registers[rs1] + imm) & ~1u; // spec requires clearing bit 0 of target
-                                               // This is mentioned in riscv unpriveleged isa spec, 
-                                               // not in the condensed manual
+            pc = target;
         }
 
         void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
@@ -426,7 +427,7 @@ namespace isa
 
         uint32_t get_imm (uint32_t instruction){
             uint32_t bit_12   = extract_bits(31, 31, instruction) << 12;
-            uint32_t bit_11   = extract_bits(7,   7, instruction) <<  7;
+            uint32_t bit_11   = extract_bits(7,   7, instruction) << 11;
             uint32_t bit_10_5 = extract_bits(30, 25, instruction) <<  5;
             uint32_t bit_4_1  = extract_bits(11,  8, instruction) <<  1;
             int32_t imm = static_cast<int32_t> ((bit_12 | bit_11 | bit_10_5 | bit_4_1) << 19) >> 19;
