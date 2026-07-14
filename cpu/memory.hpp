@@ -3,11 +3,14 @@
 
 class Memory {
 public:
-    void reset();
-    void loadProgram(const char* path);
+    // Sets up starting state: allocates the emulated 4GB memory space,
+    // zeroes all registers, and initializes pc/sp to their reset values.
+    void reset(uint32_t* registers, uint32_t& pc);
+
+    void loadProgram(const char* path, uint32_t pc);
 
     uint8_t* data();
-    uint32_t getLastInstructionAddr() const;
+    uint32_t getLastInstructionAddr();
 
 private:
     uint8_t* memory {nullptr};
