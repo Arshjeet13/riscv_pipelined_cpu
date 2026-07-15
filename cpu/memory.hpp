@@ -7,6 +7,9 @@ public:
     // zeroes all registers, and initializes pc/sp to their reset values.
     void reset(uint32_t* registers, uint32_t& pc);
 
+    // Reads a program (one hex-encoded instruction per line) from the
+    // given file and writes it into memory starting at the address
+    // pc was reset to.
     void loadProgram(const char* path, uint32_t pc);
 
     uint8_t* data();
