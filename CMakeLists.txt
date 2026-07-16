@@ -21,6 +21,8 @@ add_compile_options(-Wall -Wextra)
 add_library(cpu_core
     cpu/cpu.cpp
     cpu/handlers.cpp
+    cpu/memory.cpp 
+    cpu/cache.cpp
 )
 
 # Anything that links cpu_core can now write `#include "cpu.hpp"`
