@@ -3,6 +3,7 @@
 #include <cstring>
 #include <climits>
 #include <cstdio>
+#include <iostream>
 #include "memory.hpp"
 
 // Cache specs : 
@@ -17,7 +18,7 @@ struct CacheLine
     bool     dirty       {false};
     uint32_t tag         {0};
     uint8_t  block[64]   {};
-    uint32_t lru_counter {0};
+    uint64_t lru_counter {0};
 };
 
 struct CacheSet
@@ -59,9 +60,13 @@ class DCache : public Cache{
 
 public:
     using Cache::Cache;
-    void write(uint32_t addr, uint8_t data);
+    void write(uint32_t addr, uint32_t data, uint32_t data_len);
+    uint64_t getDirtyMissCount();
 
 private:
+    void writeByte(uint32_t addr, uint8_t  data);
+    void writeHalf(uint32_t addr, uint16_t data);
+    void writeWord(uint32_t addr, uint32_t data);
     void writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line);
 };
 

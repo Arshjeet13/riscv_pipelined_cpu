@@ -139,7 +139,6 @@ uint16_t Cache::readHalf(uint32_t addr){
 uint32_t Cache::readWord(uint32_t addr){
     CacheLine& line1 = findOrAllocateLine(addr);
     uint32_t byte_idx1 = getByteIndex(addr);
-    uint8_t byte1 = line1.block[byte_idx1];
 
     if(byte_idx1 >= 61){
         int data_len_line1 = 64 - byte_idx1;
@@ -178,6 +177,7 @@ uint32_t Cache::read(uint32_t addr, uint32_t data_len){
         break;
     
     default:
+        std::cerr << "Read request to cache was not of size 1/2/4 bytes\n";
         return -1;
         break;
     }
@@ -190,7 +190,94 @@ void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){
     line.lru_counter = ++timer;
 }
 
-void DCache::write(uint32_t addr, uint8_t data){
+void DCache::writeByte(uint32_t addr, uint8_t  data){
     CacheLine& line = findOrAllocateLine(addr);
-    writeDataToLine(data, addr, line);    
+    writeDataToLine(data, addr, line); 
+}
+
+void DCache::writeHalf(uint32_t addr, uint16_t data){
+    CacheLine& line1 = findOrAllocateLine(addr);
+    uint32_t byte_idx1 = getByteIndex(addr);
+    uint8_t byte1 = static_cast<uint8_t> (data & (0x00FF));
+    uint8_t byte2 = static_cast<uint8_t> ((data & (0xFF00)) >> 8);
+
+    if(byte_idx1 == 63){
+        CacheLine& line2 = findOrAllocateLine(addr + 1);
+        writeDataToLine(byte1, addr, line1);
+        writeDataToLine(byte2, addr+1, line2);        
+    }
+    else{
+        writeDataToLine(byte1, addr, line1);
+        writeDataToLine(byte2, addr + 1, line1);
+    }
+}
+
+void DCache::writeWord(uint32_t addr, uint32_t data){
+    CacheLine& line1 = findOrAllocateLine(addr);
+    uint32_t byte_idx1 = getByteIndex(addr);
+    uint8_t byte1 = static_cast<uint8_t> ( data & (0x000000FF));
+    uint8_t byte2 = static_cast<uint8_t> ((data & (0x0000FF00)) >> 8);
+    uint8_t byte3 = static_cast<uint8_t> ((data & (0x00FF0000)) >> 16);
+    uint8_t byte4 = static_cast<uint8_t> ((data & (0xFF000000)) >> 24);
+
+    if(byte_idx1 >= 61){
+        CacheLine& line2 = findOrAllocateLine(addr + 4); // 4 is a big enough value to give us the 
+                                                         // line with remaining bytes of data
+        int data_len_line1 = 64 - byte_idx1;
+        switch (data_len_line1)
+        {
+        case 1:
+            writeDataToLine(byte1, addr,   line1);
+            writeDataToLine(byte2, addr+1, line2);
+            writeDataToLine(byte3, addr+2, line2);
+            writeDataToLine(byte4, addr+3, line2);
+
+            break;
+        case 2:
+            writeDataToLine(byte1, addr,   line1);
+            writeDataToLine(byte2, addr+1, line1);
+            writeDataToLine(byte3, addr+2, line2);
+            writeDataToLine(byte4, addr+3, line2);
+            break;
+        
+        case 3:
+            writeDataToLine(byte1, addr,   line1);
+            writeDataToLine(byte2, addr+1, line1);
+            writeDataToLine(byte3, addr+2, line1);
+            writeDataToLine(byte4, addr+3, line2);
+            break;
+
+        default:
+            break;
+        }              
+    }
+    else{
+        writeDataToLine(byte1, addr,   line1);
+        writeDataToLine(byte2, addr+1, line1);
+        writeDataToLine(byte3, addr+2, line1);
+        writeDataToLine(byte4, addr+3, line1);
+    }
+}
+
+void DCache::write(uint32_t addr, uint32_t data, uint32_t data_len){
+
+    switch (data_len)
+    {
+    case 1:
+        writeByte(addr, data);
+        break;
+    case 2:
+        writeHalf(addr, data);
+        break;
+    case 4:
+        writeWord(addr, data);
+        break;
+    default:
+        std::cerr << "Write request to Data cache was not of size 1/2/4 bytes\n";
+        break;
+    }   
+}
+
+uint64_t DCache::getDirtyMissCount(){
+    return dirty_miss_count;
 }
