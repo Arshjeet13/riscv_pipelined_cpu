@@ -30,6 +30,62 @@ uint32_t Cache::getByteIndex(uint32_t addr){
     return extract_bits(5, 0, addr);
 }
 
+CacheLine& Cache::findOrAllocateLine(uint32_t addr){
+    uint32_t set_num = getSet(addr);
+    uint32_t tag     = getTag(addr);
+
+    CacheSet& set = sets[set_num];
+
+    int line_idx = -1;
+    int empty_line_idx = -1;
+    int empty_line_cnt = 0;
+
+    for(int i = 0; i < 8; ++i){
+        CacheLine& line = set.lines[i];
+        if(!line.valid){
+            empty_line_cnt++;
+            empty_line_idx = i;
+            continue;
+        }
+
+        if(line.tag == tag){
+            line_idx = i;
+            break;
+        }
+    }
+
+    if(line_idx != -1){
+        hit_count++;
+        CacheLine& line = set.lines[line_idx];
+        line.lru_counter = ++timer;
+        return line;
+    }
+
+    miss_count++;
+
+    if(empty_line_cnt != 0){
+        CacheLine& line = set.lines[empty_line_idx];
+        loadDataToLine(addr, line);
+        return line;
+    }
+    else{
+        uint64_t smallest = LLONG_MAX;
+        uint64_t smallest_line_idx = -1;
+        for(int i = 0; i < 8; ++i){
+            CacheLine& line = set.lines[i];
+            if(smallest > line.lru_counter){
+                smallest = line.lru_counter;
+                smallest_line_idx = i;
+            }
+        }
+        
+        CacheLine& line = set.lines[smallest_line_idx];
+        evictDataFromLine(set_num, line);
+        loadDataToLine(addr, line);
+        return line;
+    }    
+}
+
 void Cache::loadDataToLine(uint32_t addr, CacheLine& line){
     uint32_t byte_idx = getByteIndex(addr);
     uint32_t block_start = addr - byte_idx;
@@ -54,67 +110,8 @@ void Cache::evictDataFromLine(uint32_t set_num, CacheLine& line){
 }
 
 uint8_t Cache::read(uint32_t addr){
-    uint32_t set_num = getSet(addr);
-    uint32_t tag     = getTag(addr);
-
-    CacheSet& set = sets[set_num];
-
-    int line_num = -1;
-    int empty_line_idx = -1;
-    int empty_line_cnt = 0;
-
-    for(int i = 0; i < 8; ++i){
-        CacheLine& line = set.lines[i];
-        if(!line.valid){
-            empty_line_cnt++;
-            empty_line_idx = i;
-            continue;
-        }
-
-        if(line.tag == tag){
-            line_num = i;
-            break;
-        }
-    }
-
-    if(line_num != -1){
-        hit_count++;
-        uint32_t byte_idx = getByteIndex(addr);
-        CacheLine& line = set.lines[line_num];
-        line.lru_counter = ++timer;
-
-        return line.block[byte_idx];
-    }
-    else{
-        miss_count++;
-
-        if(empty_line_cnt != 0){
-            CacheLine& line = set.lines[empty_line_idx];
-
-            loadDataToLine(addr, line);
-
-            return line.block[getByteIndex(addr)];
-        }
-        else{
-            uint64_t smallest = LLONG_MAX;
-            uint64_t smallest_line_idx = -1;
-            for(int i = 0; i < 8; ++i){
-                CacheLine& line = set.lines[i];
-                if(smallest > line.lru_counter){
-                    smallest = line.lru_counter;
-                    smallest_line_idx = i;
-                }
-            }
-            
-            CacheLine& line = set.lines[smallest_line_idx];
-
-            evictDataFromLine(set_num, line);
-
-            loadDataToLine(addr, line);
-            
-            return line.block[getByteIndex(addr)];
-        }
-    }
+    CacheLine& line = findOrAllocateLine(addr);
+    return line.block[getByteIndex(addr)];
 }
 
 void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){
@@ -125,58 +122,6 @@ void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){
 }
 
 void DCache::write(uint32_t addr, uint8_t data){
-    uint32_t set_num = getSet(addr);
-    uint32_t tag     = getTag(addr);
-
-    CacheSet& set = sets[set_num];
-
-    int line_num = -1;
-    int empty_line_idx = -1;
-    int empty_line_cnt = 0;
-
-    for(int i = 0; i < 8; ++i){
-        CacheLine& line = set.lines[i];
-        if(!line.valid){
-            empty_line_cnt++;
-            empty_line_idx = i;
-            continue;
-        }
-
-        if(line.tag == tag){
-            line_num = i;
-            break;
-        }
-    }
-
-    if(line_num != -1){
-        hit_count++;
-        CacheLine& line = set.lines[line_num];
-        writeDataToLine(data, addr, line);
-    }
-    else{
-        miss_count++;
-
-        if(empty_line_cnt != 0){
-            CacheLine& line = set.lines[empty_line_idx];
-            loadDataToLine(addr, line);
-            writeDataToLine(data, addr, line);
-        }
-        else{
-            uint64_t smallest = LLONG_MAX;
-            uint64_t smallest_line_idx = -1;
-            for(int i = 0; i < 8; ++i){
-                CacheLine& line = set.lines[i];
-                if(smallest > line.lru_counter){
-                    smallest = line.lru_counter;
-                    smallest_line_idx = i;
-                }
-            }
-            
-            CacheLine& line = set.lines[smallest_line_idx];
-
-            evictDataFromLine(set_num, line);
-            loadDataToLine(addr, line);
-            writeDataToLine(data, addr, line);
-        }
-    }
+    CacheLine& line = findOrAllocateLine(addr);
+    writeDataToLine(data, addr, line);    
 }
