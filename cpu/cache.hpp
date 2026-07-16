@@ -40,6 +40,7 @@ protected:
     // addr is the address of some byte beloning to the block which is going
     // to be loaded into the line. It need not be the first address of the block
     void     loadDataToLine(uint32_t addr, CacheLine& line);
+    void     evictDataFromLine(uint32_t set_num, CacheLine& line);
 
     uint8_t* memory      {nullptr};
     uint64_t timer       {};
@@ -53,6 +54,7 @@ class DCache : public Cache{
 public:
     using Cache::Cache;
     void write(uint32_t addr, uint8_t data);
+    void writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line);
 };
 
 class ICache : public Cache{

@@ -31,15 +31,27 @@ uint32_t Cache::getByteIndex(uint32_t addr){
 }
 
 void Cache::loadDataToLine(uint32_t addr, CacheLine& line){
-        uint32_t byte_idx = getByteIndex(addr);
-        uint32_t block_start = addr - byte_idx;
-        line.valid = true;
-        line.tag = getTag(addr);
-        memcpy(line.block, &memory[block_start], 64);
-        line.lru_counter = ++timer;
+    uint32_t byte_idx = getByteIndex(addr);
+    uint32_t block_start = addr - byte_idx;
+    line.valid = true;
+    line.tag = getTag(addr);
+    memcpy(line.block, &memory[block_start], 64);
+    line.lru_counter = ++timer;
 }
 
+void Cache::evictDataFromLine(uint32_t set_num, CacheLine& line){
+    if(line.dirty){
+        uint32_t start_addr {};
+        uint32_t tag = line.tag;
+        start_addr = (tag << 12) | (set_num << 6);
+        memcpy(&memory[start_addr], line.block, 64);
+    }
 
+    line.valid = false;
+    line.dirty = false;
+    line.tag = static_cast<uint32_t> (0);
+    line.lru_counter = ++timer;
+}
 
 uint8_t Cache::read(uint32_t addr){
     uint32_t set_num = getSet(addr);
@@ -96,11 +108,20 @@ uint8_t Cache::read(uint32_t addr){
             
             CacheLine& line = set.lines[smallest_line_idx];
 
+            evictDataFromLine(set_num, line);
+
             loadDataToLine(addr, line);
             
             return line.block[getByteIndex(addr)];
         }
     }
+}
+
+void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){
+    uint32_t byte_idx = getByteIndex(addr);
+    line.dirty = true;
+    line.block[byte_idx] = data;    
+    line.lru_counter = ++timer;
 }
 
 void DCache::write(uint32_t addr, uint8_t data){
@@ -129,19 +150,16 @@ void DCache::write(uint32_t addr, uint8_t data){
 
     if(line_num != -1){
         hit_count++;
-
-        uint32_t byte_idx = getByteIndex(addr);
         CacheLine& line = set.lines[line_num];
-        line.lru_counter = ++timer;
-
+        writeDataToLine(data, addr, line);
     }
     else{
         miss_count++;
 
         if(empty_line_cnt != 0){
             CacheLine& line = set.lines[empty_line_idx];
-
             loadDataToLine(addr, line);
+            writeDataToLine(data, addr, line);
         }
         else{
             uint64_t smallest = LLONG_MAX;
@@ -156,7 +174,9 @@ void DCache::write(uint32_t addr, uint8_t data){
             
             CacheLine& line = set.lines[smallest_line_idx];
 
+            evictDataFromLine(set_num, line);
             loadDataToLine(addr, line);
+            writeDataToLine(data, addr, line);
         }
     }
 }
