@@ -46,9 +46,10 @@ void CPU::run(){
 }
 
 uint32_t CPU::fetch(){
-    // uint32_t instruction;
-    // memcpy(&instruction, &memory[pc], sizeof(instruction));
-    // return instruction;
+    uint32_t instruction;
+    uint32_t instr_addr = pc;
+    instruction = icache.read(instr_addr);
+    return instruction;
 }
 
 void CPU::update_pc(){
