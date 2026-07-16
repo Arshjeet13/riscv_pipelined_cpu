@@ -56,7 +56,7 @@ uint8_t* Memory::data(){
     return memory;
 }
 
-uint32_t Memory::getLastInstructionAddr(){
+uint32_t Memory::getLastInstrAddr(){
     return last_instruction_addr;
 }
 

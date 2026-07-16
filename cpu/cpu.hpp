@@ -1,16 +1,13 @@
 #pragma once
+#include "cache.hpp"
+#include "memory.hpp"
 #include <cstdint>
 
 class CPU {
 public:
     // Sets up starting state: allocates the emulated 4GB memory space,
     // zeroes all registers, and initializes pc/sp to their reset values.
-    void reset();
-
-    // Reads a program (one hex-encoded instruction per line) from the
-    // given file and writes it into memory starting at the address
-    // pc was reset to.
-    void loadProgram(const char* path);
+    void reset(Memory memory, DCache& dcache, ICache& icache);
 
     // The fetch decode execute loop. It will runs until all instructions are processed.
     void run();
@@ -24,7 +21,12 @@ public:
     void update_pc();
 
 private:
-    uint8_t* memory {nullptr};
+    void attachDcache(DCache& dcache);
+    void attachIcache(ICache& icache);
+    void getLastInstrAddr(Memory memory);
+
+    DCache dcache;
+    ICache icache;
     uint32_t registers[32] = {};
     uint32_t pc {0};
     uint32_t last_instruction_addr {0};

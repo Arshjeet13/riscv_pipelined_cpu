@@ -13,7 +13,7 @@ public:
     void loadProgram(const char* path, uint32_t pc);
 
     uint8_t* data();
-    uint32_t getLastInstructionAddr();
+    uint32_t getLastInstrAddr();
 
 private:
     uint8_t* memory {nullptr};
