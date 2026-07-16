@@ -5,7 +5,7 @@
 #include <cstring>
 #include <cstdint>
 
-void Memory::reset(uint32_t* registers, uint32_t& pc){
+void Memory::reset(){
     const size_t SIZE = 4ULL * 1024 * 1024 * 1024; // 4GB
 
     // Reserve memory
@@ -23,17 +23,6 @@ void Memory::reset(uint32_t* registers, uint32_t& pc){
     }
 
     memory = static_cast<uint8_t*>(region);
-
-    // zero all registers
-    for (int i = 0; i < 32; ++i) {
-        registers[i] = 0;
-    }
-
-    // initialize stack pointer (x2) to 0xFFFFFFF0
-    registers[2] = 0xFFFFFFF0;
-
-    // initialize pc to the code's load address (0x1000)
-    pc = 0x00001000;
 }
 
 void Memory::loadProgram(const char* path, uint32_t pc){

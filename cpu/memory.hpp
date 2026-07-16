@@ -3,9 +3,8 @@
 
 class Memory {
 public:
-    // Sets up starting state: allocates the emulated 4GB memory space,
-    // zeroes all registers, and initializes pc/sp to their reset values.
-    void reset(uint32_t* registers, uint32_t& pc);
+    // Sets up starting state: allocates the emulated 4GB memory space
+    void reset();
 
     // Reads a program (one hex-encoded instruction per line) from the
     // given file and writes it into memory starting at the address
