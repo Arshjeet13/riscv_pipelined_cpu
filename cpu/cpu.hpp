@@ -21,8 +21,6 @@ public:
     void update_pc();
 
 private:
-    void attachDcache(DCache& dcache);
-    void attachIcache(ICache& icache);
     void getLastInstrAddr(Memory memory);
 
     DCache& dcache;

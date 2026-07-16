@@ -19,20 +19,10 @@ CPU::CPU(Memory& memory, DCache& dcache, ICache& icache) : dcache(dcache), icach
     registers[2] = 0xFFFFFFF0;
 
     getLastInstrAddr(memory);
-    attachDcache(dcache);
-    attachIcache(icache);
 }
 
 void CPU::getLastInstrAddr(Memory memory){
     last_instruction_addr = memory.getLastInstrAddr();
-}
-
-void CPU::attachDcache(DCache& dcache){
-    CPU::dcache = dcache;
-}
-
-void CPU::attachIcache(ICache& icache){
-    CPU::icache = icache;    
 }
 
 void CPU::run(){
