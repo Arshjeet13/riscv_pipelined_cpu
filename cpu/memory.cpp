@@ -5,7 +5,7 @@
 #include <cstring>
 #include <cstdint>
 
-void Memory::reset(){
+Memory::Memory(){
     const size_t SIZE = 4ULL * 1024 * 1024 * 1024; // 4GB
 
     // Reserve memory
@@ -25,10 +25,10 @@ void Memory::reset(){
     memory = static_cast<uint8_t*>(region);
 }
 
-void Memory::loadProgram(const char* path, uint32_t pc){
+void Memory::loadProgram(const char* path){
     freopen(path, "r", stdin);
 
-    uint32_t instruction_addr = pc;
+    uint32_t instruction_addr = first_instruction_addr;
 
     std::string instruction_text;
 
@@ -43,6 +43,10 @@ void Memory::loadProgram(const char* path, uint32_t pc){
 
 uint8_t* Memory::data(){
     return memory;
+}
+
+uint32_t Memory::getFirstInstrAddr(){
+    return first_instruction_addr;
 }
 
 uint32_t Memory::getLastInstrAddr(){
