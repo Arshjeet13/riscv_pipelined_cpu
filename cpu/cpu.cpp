@@ -5,10 +5,10 @@
 #include <cstdio>
 #include <cstring>
 
-void CPU::reset(Memory memory, DCache& dcache, ICache& icache){
+CPU::CPU(Memory& memory, DCache& dcache, ICache& icache) : dcache(dcache), icache(icache) {
 
-    // initialize pc to the code's load address (0x1000)
-    pc = 0x00001000;
+    // initialize pc to the code's load address. Deafault value : (0x1000)
+    pc = memory.getFirstInstrAddr();
 
     // zero all registers
     for (int i = 0; i < 32; ++i) {
@@ -19,6 +19,8 @@ void CPU::reset(Memory memory, DCache& dcache, ICache& icache){
     registers[2] = 0xFFFFFFF0;
 
     getLastInstrAddr(memory);
+    attachDcache(dcache);
+    attachIcache(icache);
 }
 
 void CPU::getLastInstrAddr(Memory memory){
@@ -48,7 +50,7 @@ void CPU::run(){
 uint32_t CPU::fetch(){
     uint32_t instruction;
     uint32_t instr_addr = pc;
-    instruction = icache.read(instr_addr);
+    instruction = icache.read(instr_addr, 4);
     return instruction;
 }
 
@@ -62,36 +64,36 @@ uint8_t CPU::decode(uint32_t instruction){
 }
 
 void CPU::execute(uint32_t instruction, uint8_t opcode){
-    // switch (opcode)
-    // {
-    // case isa::op_R:
-    //     isa::R::handle_instr(instruction, registers);
-    //     break;
-    // case isa::op_I_IMM:
-    //     isa::I_IMM::handle_instr(instruction, registers);
-    //     break;
-    // case isa::op_I_MEM:
-    //     isa::I_MEM::handle_instr(instruction, registers, memory);
-    //     break;
-    // case isa::op_I_JMP:
-    //     isa::I_JMP::handle_instr(instruction, registers, pc);
-    //     break;
-    // case isa::op_S:
-    //     isa::S::handle_instr(instruction, registers, memory);
-    //     break;
-    // case isa::op_B:
-    //     isa::B::handle_instr(instruction, registers, pc);
-    //     break;
-    // case isa::op_J:
-    //     isa::J::handle_instr(instruction, registers, pc);
-    //     break;
-    // case isa::op_U1:
-    //     isa::U::handle_instr(instruction, registers, pc, opcode);
-    //     break;
-    // case isa::op_U2:
-    //     isa::U::handle_instr(instruction, registers, pc, opcode);
-    //     break;
-    // default:
-    //     break;
-    // }
+    switch (opcode)
+    {
+    case isa::op_R:
+        isa::R::handle_instr(instruction, registers);
+        break;
+    case isa::op_I_IMM:
+        isa::I_IMM::handle_instr(instruction, registers);
+        break;
+    case isa::op_I_MEM:
+        isa::I_MEM::handle_instr(instruction, registers, dcache);
+        break;
+    case isa::op_I_JMP:
+        isa::I_JMP::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_S:
+        isa::S::handle_instr(instruction, registers, dcache);
+        break;
+    case isa::op_B:
+        isa::B::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_J:
+        isa::J::handle_instr(instruction, registers, pc);
+        break;
+    case isa::op_U1:
+        isa::U::handle_instr(instruction, registers, pc, opcode);
+        break;
+    case isa::op_U2:
+        isa::U::handle_instr(instruction, registers, pc, opcode);
+        break;
+    default:
+        break;
+    }
 }
