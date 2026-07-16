@@ -1,6 +1,6 @@
 # RISC-V (RV32I) Pipelined CPU Emulator
 
-A C++ emulator for RV32I (the base 32-bit integer RISC-V ISA), built up in phases from a single-cycle model to a pipelined CPU with a cache hierarchy and a gshare branch predictor. Full roadmap and rationale: [project.md](project.md).
+A C++ emulator for RV32I (the base 32-bit integer RISC-V ISA), built up in phases from a single-cycle model to a pipelined CPU with a cache hierarchy and a gshare branch predictor.
 
 ## Status
 

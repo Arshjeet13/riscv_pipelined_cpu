@@ -8,7 +8,7 @@ A software emulator for a real CPU instruction set architecture (RV32I, the base
 
 This project doesn't solve an external problem the way the KV store does (durability, fault tolerance). Its value is different: it forces you to build, from scratch, the exact mechanism that determines how fast real code actually runs on real hardware. Two instructions that look equally simple in C++ can differ by 10-20x in execution time depending on branch predictability and cache behavior — and most software engineers never build the mental model for *why*. You'll not only build that model, you'll implement it, which is a different and much deeper kind of understanding than reading about it.
 
-This also directly complements low-latency systems work: understanding pipeline stalls, branch misprediction cost, and cache misses at the implementation level is exactly the intuition that lets you write hot-path C++ that doesn't fight the CPU.
+This is also specifically the gap your coursework leaves open. CS354 gave you instruction encoding, x86 assembly, calling conventions, virtual memory, and a set-associative cache simulator — real, relevant foundations — but stopped short of pipelining, hazards, and branch prediction, which is where a huge fraction of "why is this code slow" reasoning in performance-critical systems actually lives. Given that you're already building a C++ limit order book and a binary wire-protocol gateway, this project directly complements that work: understanding pipeline stalls, branch misprediction cost, and cache misses at the implementation level is exactly the intuition that lets you write hot-path C++ that doesn't fight the CPU.
 
 ## What you end up with (the concrete output)
 
@@ -34,7 +34,7 @@ Nothing here needs a UI or persistence — the deliverable is the simulator itse
 - Read the register file layout (`x0`–`x31`, with `x0` hardwired to zero — a RISC-V-specific quirk worth knowing early) and the calling convention naming (`ra`, `sp`, `a0`-`a7`, etc.)
 - Set up the project: CMake build, and a directory layout separating the CPU core (`cpu/`), later pipeline logic (`pipeline/`), and tests (`tests/`)
 
-**Knowledge needed:** Nothing conceptually new if you already understand instruction encoding from prior x86 work — this phase is learning RISC-V's specific *vocabulary* (which bits mean what), not a new idea. Budget 2-3 days almost entirely for reading the spec's instruction format tables closely enough that you can decode an instruction by hand before writing decode code.
+**Knowledge needed:** Nothing conceptually new — you already understand "instructions are bits that get decoded" from CS354's x86 work. This phase is learning RISC-V's specific *vocabulary* (which bits mean what), not a new idea. Budget 2-3 days almost entirely for reading the spec's instruction format tables closely enough that you can decode an instruction by hand before writing decode code.
 
 **Done when:** You can take a raw 32-bit instruction word from the spec's examples and manually identify its format, opcode, and operands on paper.
 
@@ -49,7 +49,7 @@ Nothing here needs a UI or persistence — the deliverable is the simulator itse
 - The fetch-decode-execute loop: read the instruction at PC, decode which operation it is, execute it (ALU op, load/store, branch/jump), update registers/memory/PC, repeat
 - Cover RV32I's core categories: arithmetic and immediate ops, loads/stores, branches, and jumps
 
-**Knowledge needed:** Low novelty if instruction execution is already familiar conceptually — this is translating that understanding into RV32I's specific instructions rather than learning the concept of "fetch-decode-execute" from scratch.
+**Knowledge needed:** Low novelty for you — you already understand instruction execution conceptually from CS354. This is translating that understanding into RV32I's specific instructions rather than learning the concept of "fetch-decode-execute" from scratch.
 
 **Done when:** You hand-trace a handful of small test programs (a loop, a few branches, a couple of loads/stores) and your emulator's register/memory state matches what you compute by hand.
 
@@ -63,7 +63,7 @@ Nothing here needs a UI or persistence — the deliverable is the simulator itse
 - A parameterized cache (you choose associativity, and use LRU replacement) that intercepts memory-stage accesses
 - Hit/miss tracking so later phases can report cache statistics alongside pipeline statistics
 
-**Knowledge needed:** Very low novelty if you've built a direct-mapped or set-associative cache with hit/miss analysis before. This phase is not about re-deriving cache theory; it's implementation practice, getting a correctly-parameterized cache wired into the CPU quickly so it's just *there* for Phase 3 onward.
+**Knowledge needed:** Very low novelty — you've already built a direct-mapped and set-associative cache with hit/miss analysis in CS354's cache lab. This phase is not about re-deriving cache theory; it's implementation practice, getting a correctly-parameterized cache wired into the CPU quickly so it's just *there* for Phase 3 onward.
 
 **Done when:** The cache reports sane hit/miss rates on a program with an obvious access pattern (e.g., a tight loop over an array should show high hit rates after warmup).
 
@@ -136,7 +136,7 @@ Nothing here needs a UI or persistence — the deliverable is the simulator itse
 ## What's deliberately not in this project
 
 - **No compiler.** Bolting one on would dilute the architecture focus and turn this into two half-finished projects instead of one deep one.
-- **No exploit/security content.** That's a separate, decoupled project — real x86-64 stack exploitation against real compiled binaries, leaning on stack/calling-convention knowledge and pushing into new territory (canaries, NX, ASLR, basic ROP) that this project doesn't touch.
+- **No exploit/security content.** That's a separate, decoupled project — real x86-64 stack exploitation against real compiled binaries, leaning on the stack/calling-convention knowledge you already have from CS354 and pushing into new territory (canaries, NX, ASLR, basic ROP) that this project doesn't touch.
 
 ---
 
