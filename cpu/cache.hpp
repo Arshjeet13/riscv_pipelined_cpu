@@ -47,6 +47,7 @@ protected:
     uint64_t timer       {};
     uint64_t hit_count   {0};
     uint64_t miss_count  {0};
+    uint64_t dirty_miss_count {0};
     CacheSet sets[64]    {};
 };
 

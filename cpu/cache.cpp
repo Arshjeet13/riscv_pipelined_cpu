@@ -97,6 +97,7 @@ void Cache::loadDataToLine(uint32_t addr, CacheLine& line){
 
 void Cache::evictDataFromLine(uint32_t set_num, CacheLine& line){
     if(line.dirty){
+        dirty_miss_count++;
         uint32_t start_addr {};
         uint32_t tag = line.tag;
         start_addr = (tag << 12) | (set_num << 6);
