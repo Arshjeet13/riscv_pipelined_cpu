@@ -1,4 +1,5 @@
 #pragma once
+#include "cache.hpp"
 #include <cstdint>
 #include <utility>
 
@@ -57,12 +58,12 @@ namespace isa
     namespace I_MEM
     {
         uint32_t get_imm (uint32_t instruction);
-        void lb    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lh    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lw    (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lbu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void lhu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, uint8_t* memory);
-        void handle_instr    (uint32_t instruction, uint32_t* registers, uint8_t* memory);
+        void lb    (int rs1, uint32_t  imm, int rd, uint32_t* registers, DCache& dcache);
+        void lh    (int rs1, uint32_t  imm, int rd, uint32_t* registers, DCache& dcache);
+        void lw    (int rs1, uint32_t  imm, int rd, uint32_t* registers, DCache& dcache);
+        void lbu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, DCache& dcache);
+        void lhu   (int rs1, uint32_t  imm, int rd, uint32_t* registers, DCache& dcache);
+        void handle_instr    (uint32_t instruction, uint32_t* registers, DCache& dcache);
     }
 
     namespace I_JMP
@@ -75,10 +76,10 @@ namespace isa
     namespace S
     {
         uint32_t get_imm (uint32_t instruction);
-        void sb    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
-        void sh    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
-        void sw    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint8_t* memory);
-        void handle_instr     (uint32_t instruction, uint32_t* registers, uint8_t* memory);
+        void sb    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, DCache& dcache);
+        void sh    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, DCache& dcache);
+        void sw    (int rs1, int rs2,  uint32_t imm, uint32_t* registers, DCache& dcache);
+        void handle_instr     (uint32_t instruction, uint32_t* registers, DCache& dcache);
     }
 
     namespace B
