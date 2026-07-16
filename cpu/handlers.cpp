@@ -278,43 +278,38 @@ namespace isa
             return static_cast<uint32_t>(imm);
         }
 
-        void lb    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+        void lb    (int rs1, uint32_t imm, int rd, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
-            int8_t  data;
-            memcpy(&data, memory + addr, sizeof(data));
+            int8_t  data = static_cast<int8_t> (dcache.read(addr, 1));
             uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
             writeRegister(result, rd, registers);
         }
-        void lh    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+        void lh    (int rs1, uint32_t imm, int rd, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
-            int16_t  data;
-            memcpy(&data, memory + addr, sizeof(data));
+            int16_t  data = static_cast<int16_t> (dcache.read(addr, 2));
             uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
             writeRegister(result, rd, registers);
         }
-        void lw    (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+        void lw    (int rs1, uint32_t imm, int rd, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
-            int32_t  data;
-            memcpy(&data, memory + addr, sizeof(data));
+            int32_t  data = static_cast<int32_t> (dcache.read(addr, 4));
             uint32_t result = static_cast<uint32_t>(static_cast<int32_t>(data));
             writeRegister(result, rd, registers);
         }
-        void lbu   (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+        void lbu   (int rs1, uint32_t imm, int rd, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
-            uint8_t  data;
-            memcpy(&data, memory + addr, sizeof(data));
+            uint8_t  data = static_cast<uint8_t> (dcache.read(addr, 1));
             uint32_t result = static_cast<uint32_t>(data);
             writeRegister(result, rd, registers);
         }
-        void lhu   (int rs1, uint32_t imm, int rd, uint32_t* registers, uint8_t* memory){
+        void lhu   (int rs1, uint32_t imm, int rd, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
-            uint16_t  data;
-            memcpy(&data, memory + addr, sizeof(data));
+            uint16_t  data = static_cast<uint16_t> (dcache.read(addr, 2));
             uint32_t result = static_cast<uint32_t>(data);
             writeRegister(result, rd, registers);
         }
 
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory){
+        void handle_instr(uint32_t instruction, uint32_t* registers, DCache& dcache){
             int rs1      {get_source_register_1(instruction)};
             int rd       {get_destination_register(instruction)};
             uint32_t imm {get_imm(instruction)};
@@ -323,19 +318,19 @@ namespace isa
 
             switch (code) {
                 case LB :
-                    lb (rs1, imm, rd, registers, memory);
+                    lb (rs1, imm, rd, registers, dcache);
                     break;
                 case LH :
-                    lh (rs1, imm, rd, registers, memory);
+                    lh (rs1, imm, rd, registers, dcache);
                     break;
                 case LW :
-                    lw (rs1, imm, rd, registers, memory);
+                    lw (rs1, imm, rd, registers, dcache);
                     break;
                 case LBU:
-                    lbu(rs1, imm, rd, registers, memory);
+                    lbu(rs1, imm, rd, registers, dcache);
                     break;
                 case LHU:
-                    lhu(rs1, imm, rd, registers, memory);
+                    lhu(rs1, imm, rd, registers, dcache);
                     break;
             }
         }
@@ -379,22 +374,22 @@ namespace isa
             return static_cast<uint32_t>(imm);
         }
         
-        void sb    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+        void sb    (int rs1, int rs2, uint32_t imm, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
             uint8_t  data = static_cast<uint8_t> (registers[rs2]);
-            memcpy(memory + addr, &data, sizeof(data));         
+            dcache.write(addr, static_cast<uint32_t>(data), sizeof(data)); 
         }
-        void sh    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+        void sh    (int rs1, int rs2, uint32_t imm, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
             uint16_t  data = static_cast<uint16_t> (registers[rs2]);
-            memcpy(memory + addr, &data, sizeof(data));      
+            dcache.write(addr, static_cast<uint32_t>(data), sizeof(data));      
         }
-        void sw    (int rs1, int rs2, uint32_t imm, uint32_t* registers, uint8_t* memory){
+        void sw    (int rs1, int rs2, uint32_t imm, uint32_t* registers, DCache& dcache){
             uint32_t addr = registers[rs1] + imm;
             uint32_t  data = static_cast<uint32_t> (registers[rs2]);
-            memcpy(memory + addr, &data, sizeof(data));      
+            dcache.write(addr, static_cast<uint32_t>(data), sizeof(data));      
         }
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint8_t* memory){
+        void handle_instr(uint32_t instruction, uint32_t* registers, DCache& dcache){
             int rs1      {get_source_register_1(instruction)};
             int rs2      {get_source_register_2(instruction)};
             uint32_t imm {get_imm(instruction)};
@@ -404,13 +399,13 @@ namespace isa
             switch (code)
             {
             case SB:
-                sb(rs1, rs2, imm, registers, memory);
+                sb(rs1, rs2, imm, registers, dcache);
                 break;
             case SH:
-                sh(rs1, rs2, imm, registers, memory);
+                sh(rs1, rs2, imm, registers, dcache);
                 break;
             case SW:
-                sw(rs1, rs2, imm, registers, memory);
+                sw(rs1, rs2, imm, registers, dcache);
                 break;
             }   
         }
