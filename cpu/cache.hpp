@@ -12,6 +12,12 @@
 // Associatvity : 8
 // Block size : 64Bytes
 
+// Address decoding format : 
+// t | s | b
+// 20 bits for tag
+// 6 bits for set number
+// 6 bits for byte number
+
 struct CacheLine
 {
     bool     valid       {false};
