@@ -35,6 +35,8 @@ void CPU::run(){
             update_pc();
         }
     }
+
+    dcache.empty_cache();
 }
 
 uint32_t CPU::fetch(){

@@ -31,7 +31,7 @@ public:
     Cache(Memory& memory);
     uint64_t getHitCount();
     uint64_t getMissCount();
-    uint32_t  read (uint32_t addr, uint32_t data_len);
+    uint32_t read (uint32_t addr, uint32_t data_len);
 
 protected:
     uint32_t extract_bits  (int l, int r, uint32_t data);
@@ -62,6 +62,7 @@ public:
     using Cache::Cache;
     void write(uint32_t addr, uint32_t data, uint32_t data_len);
     uint64_t getDirtyMissCount();
+    void empty_cache();
 
 private:
     void writeByte(uint32_t addr, uint8_t  data);

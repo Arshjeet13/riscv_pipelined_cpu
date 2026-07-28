@@ -183,6 +183,23 @@ uint32_t Cache::read(uint32_t addr, uint32_t data_len){
     }
 }
 
+void DCache::empty_cache(){
+    for(int set_num = 0; set_num < 64; ++set_num){
+        CacheSet& set = sets[set_num];
+
+        for(int i=0; i<8; ++i){
+            CacheLine& line = set.lines[i];
+            if(line.dirty){
+                line.dirty = false;
+                uint32_t start_addr {};
+                uint32_t tag = line.tag;
+                start_addr = (tag << 12) | (set_num << 6);
+                memcpy(&memory[start_addr], line.block, 64);
+            }
+        }
+    }
+}
+
 void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){
     uint32_t byte_idx = getByteIndex(addr);
     line.dirty = true;
