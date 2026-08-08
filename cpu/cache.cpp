@@ -191,6 +191,7 @@ void DCache::empty_cache(){
             CacheLine& line = set.lines[i];
             if(line.dirty){
                 line.dirty = false;
+                flushed_line_count++;
                 uint32_t start_addr {};
                 uint32_t tag = line.tag;
                 start_addr = (tag << 12) | (set_num << 6);
@@ -198,6 +199,10 @@ void DCache::empty_cache(){
             }
         }
     }
+}
+
+uint64_t DCache::getFlushedLineCount(){
+    return flushed_line_count;
 }
 
 void DCache::writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line){

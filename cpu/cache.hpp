@@ -68,6 +68,7 @@ public:
     using Cache::Cache;
     void write(uint32_t addr, uint32_t data, uint32_t data_len);
     uint64_t getDirtyMissCount();
+    uint64_t getFlushedLineCount();
     void empty_cache();
 
 private:
@@ -75,6 +76,8 @@ private:
     void writeHalf(uint32_t addr, uint16_t data);
     void writeWord(uint32_t addr, uint32_t data);
     void writeDataToLine(uint8_t data, uint32_t addr, CacheLine& line);
+
+    uint64_t flushed_line_count {0};
 };
 
 class ICache : public Cache{
