@@ -9,7 +9,7 @@ The finished emulator will load and run RV32I programs in two modes — single-c
 ## Status
 
 - **Phase 0-1 (single-cycle CPU): complete.** Fetch/decode/execute loop covering R, I (imm + load), S, B, J, U instruction formats.
-- **Phase 2 (cache): in progress.** `Memory`/`Cache` split with separate icache/dcache, true-LRU replacement, write-back with dirty-bit tracking, byte/half/word access including cross-line boundaries, and hit/miss/hit-rate reporting all implemented and verified. Remaining: flush dirty lines to memory on halt, and cycle-cost accounting.
+- **Phase 2 (cache): complete.** `Memory`/`Cache` split with separate icache/dcache, true-LRU replacement, write-back with dirty-bit tracking, byte/half/word access including cross-line boundaries, hit/miss/hit-rate reporting, flush-on-halt, and cycle-cost accounting.
 - **Phase 3 (pipelining), Phase 4 (gshare branch prediction): not started.**
 
 ## Build
