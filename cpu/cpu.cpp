@@ -21,7 +21,7 @@ CPU::CPU(Memory& memory, DCache& dcache, ICache& icache) : dcache(dcache), icach
     getLastInstrAddr(memory);
 }
 
-void CPU::getLastInstrAddr(Memory memory){
+void CPU::getLastInstrAddr(Memory& memory){
     last_instruction_addr = memory.getLastInstrAddr();
 }
 
