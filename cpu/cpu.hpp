@@ -21,7 +21,7 @@ public:
     void update_pc();
 
 private:
-    void getLastInstrAddr(Memory memory);
+    void getLastInstrAddr(Memory& memory);
 
     DCache& dcache;
     ICache& icache;
