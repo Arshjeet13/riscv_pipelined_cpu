@@ -344,20 +344,20 @@ namespace isa
             return static_cast<uint32_t>(imm);
         }
 
-        void jalr(int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void jalr(int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             uint32_t target = (registers[rs1] + imm) & ~1u;// spec requires clearing bit 0 of target
                                                            // This is mentioned in riscv unpriveleged isa spec, 
                                                            // not in the condensed manual
             writeRegister(pc + 4, rd, registers);
-            pc = target;
+            next_pc = target;
         }
 
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int rs1      {get_source_register_1(instruction)};
             int rd       {get_destination_register(instruction)};
             uint32_t imm {get_imm(instruction)};
 
-            jalr(rs1, rd, imm, registers, pc);
+            jalr(rs1, rd, imm, registers, pc, next_pc);
         }
     }
 
@@ -429,50 +429,50 @@ namespace isa
             return static_cast<uint32_t> (imm);
         }
 
-        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
             int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
 
             if (rs1_val == rs2_val) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
-        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
             int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
 
             if (rs1_val != rs2_val) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
-        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
             int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
 
             if (rs1_val < rs2_val) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
-        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int32_t rs1_val = static_cast<int32_t> (registers[rs1]);
             int32_t rs2_val = static_cast<int32_t> (registers[rs2]);
 
             if (rs1_val >= rs2_val) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
-        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             if (registers[rs1] < registers[rs2]) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
-        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc){
+        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             if (registers[rs1] >= registers[rs2]) {
-                pc += imm;
+                next_pc = pc + imm;
             }
         }
 
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int rs1 {get_source_register_1(instruction)};
             int rs2 {get_source_register_2(instruction)};
             uint32_t imm {get_imm(instruction)};
@@ -482,22 +482,22 @@ namespace isa
             switch (code)
             {
             case BEQ:
-                beq(rs1, rs2, imm, registers, pc);
+                beq(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             case BNE:
-                bne(rs1, rs2, imm, registers, pc);
+                bne(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             case BLT:
-                blt(rs1, rs2, imm, registers, pc);
+                blt(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             case BGE:
-                bge(rs1, rs2, imm, registers, pc);
+                bge(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             case BLTU:
-                bltu(rs1, rs2, imm, registers, pc);
+                bltu(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             case BGEU:
-                bgeu(rs1, rs2, imm, registers, pc);
+                bgeu(rs1, rs2, imm, registers, pc, next_pc);
                 break;
             default:
                 break;
@@ -517,15 +517,15 @@ namespace isa
             return static_cast<uint32_t> (imm);
         }
 
-        void jal   (int rd, uint32_t imm, uint32_t *registers, uint32_t& pc){
+        void jal   (int rd, uint32_t imm, uint32_t *registers, uint32_t& pc, uint32_t& next_pc){
             writeRegister(pc + 4, rd, registers);  
-            pc += imm;          
+            next_pc = pc + imm;   
         }
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc){
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc){
             int rd {get_destination_register(instruction)};
             uint32_t imm {get_imm(instruction)};
 
-            jal(rd, imm, registers, pc);
+            jal(rd, imm, registers, pc, next_pc);
         }
     }
 

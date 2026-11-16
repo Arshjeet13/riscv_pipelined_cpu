@@ -69,8 +69,8 @@ namespace isa
     namespace I_JMP
     {
         uint32_t get_imm(uint32_t instruction);
-        void jalr   (int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc);
+        void jalr   (int rs1, int rd, uint32_t imm, uint32_t* registers, uint32_t& pc, u_int32_t& next_pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
     }
 
     namespace S
@@ -85,20 +85,20 @@ namespace isa
     namespace B
     {
         uint32_t get_imm (uint32_t instruction);
-        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void handle_instr     (uint32_t instruction, uint32_t* registers, uint32_t&  pc);
+        void beq   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void bne   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void blt   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void bge   (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void bltu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void bgeu  (int rs1, int rs2,  uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void handle_instr     (uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
     }
 
     namespace J
     {
         uint32_t get_imm(uint32_t instruction);
-        void jal   (int rd, uint32_t imm, uint32_t* registers, uint32_t& pc);
-        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc);
+        void jal   (int rd, uint32_t imm, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
+        void handle_instr(uint32_t instruction, uint32_t* registers, uint32_t& pc, uint32_t& next_pc);
     }
 
     namespace U
