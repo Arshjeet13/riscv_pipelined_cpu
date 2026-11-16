@@ -26,14 +26,15 @@ void CPU::getLastInstrAddr(Memory memory){
 }
 
 void CPU::run(){
+    // instruction needs the PC to reflect it's own memory address
+    // next_pc is needed since instructions may be of type JMP, i.e. adding an offset to PC
+    // offset may be 0 as well
     while(pc <= last_instruction_addr){
-        uint32_t saved_pc = pc;
+        next_pc = pc + 4;
         uint32_t instruction = fetch();
         uint8_t opcode = decode(instruction);
         execute(instruction, opcode);
-        if(pc == saved_pc){
-            update_pc();
-        }
+        pc = next_pc;
     }
 
     dcache.empty_cache();
@@ -44,10 +45,6 @@ uint32_t CPU::fetch(){
     uint32_t instr_addr = pc;
     instruction = icache.read(instr_addr, 4);
     return instruction;
-}
-
-void CPU::update_pc(){
-    pc += 4;
 }
 
 uint8_t CPU::decode(uint32_t instruction){
@@ -68,16 +65,16 @@ void CPU::execute(uint32_t instruction, uint8_t opcode){
         isa::I_MEM::handle_instr(instruction, registers, dcache);
         break;
     case isa::op_I_JMP:
-        isa::I_JMP::handle_instr(instruction, registers, pc);
+        isa::I_JMP::handle_instr(instruction, registers, pc, next_pc);
         break;
     case isa::op_S:
         isa::S::handle_instr(instruction, registers, dcache);
         break;
     case isa::op_B:
-        isa::B::handle_instr(instruction, registers, pc);
+        isa::B::handle_instr(instruction, registers, pc, next_pc);
         break;
     case isa::op_J:
-        isa::J::handle_instr(instruction, registers, pc);
+        isa::J::handle_instr(instruction, registers, pc, next_pc);
         break;
     case isa::op_U1:
         isa::U::handle_instr(instruction, registers, pc, opcode);

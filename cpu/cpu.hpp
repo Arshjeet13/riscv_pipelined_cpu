@@ -27,6 +27,7 @@ private:
     ICache& icache;
     uint32_t registers[32] = {};
     uint32_t pc {0};
+    uint32_t next_pc {0};
     uint32_t last_instruction_addr {0};
 };
 
