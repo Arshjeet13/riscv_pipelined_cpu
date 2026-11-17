@@ -20,8 +20,9 @@ add_compile_options(-Wall -Wextra)
 # without copy-pasting anything.
 add_library(cpu_core
     cpu/cpu.cpp
+    cpu/pipelined_cpu.cpp
     cpu/handlers.cpp
-    cpu/memory.cpp 
+    cpu/memory.cpp
     cpu/cache.cpp
 )
 
