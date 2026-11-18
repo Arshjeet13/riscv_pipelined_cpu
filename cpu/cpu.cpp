@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 
+
 CPU::CPU(Memory& memory, DCache& dcache, ICache& icache) : dcache(dcache), icache(icache) {
 
     // initialize pc to the code's load address. Deafault value : (0x1000)
@@ -85,4 +86,8 @@ void CPU::execute(uint32_t instruction, uint8_t opcode){
     default:
         break;
     }
+}
+
+const uint32_t* CPU::get_registers() const{
+    return registers;    
 }

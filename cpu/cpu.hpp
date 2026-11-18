@@ -11,16 +11,16 @@ public:
 
     // The fetch decode execute loop. It will runs until all instructions are processed.
     void run();
+    
+    const uint32_t* get_registers() const;
 
+private:
     uint32_t fetch();
 
     uint8_t decode(uint32_t instruction);
 
     void execute(uint32_t instruction, uint8_t opcode);
 
-    void update_pc();
-
-private:
     void getLastInstrAddr(Memory& memory);
 
     DCache& dcache;
