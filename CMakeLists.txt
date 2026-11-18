@@ -30,6 +30,7 @@ add_library(cpu_core
 # and CMake knows to look inside the cpu/ directory for it.
 target_include_directories(cpu_core PUBLIC cpu)
 
-# The actual emulator executable: just main.cpp, linked against cpu_core.
-add_executable(riscv_emulator main.cpp)
+# The actual emulator executable: main.cpp plus the single-cycle vs. pipelined
+# state comparison harness, linked against cpu_core.
+add_executable(riscv_emulator main.cpp compare_tool.cpp)
 target_link_libraries(riscv_emulator PRIVATE cpu_core)
