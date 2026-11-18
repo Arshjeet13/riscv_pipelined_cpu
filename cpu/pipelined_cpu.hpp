@@ -10,6 +10,8 @@ public:
 
     void run();
 
+    const uint32_t* get_registers() const;
+
 private:
     void fetch();
     void decode();

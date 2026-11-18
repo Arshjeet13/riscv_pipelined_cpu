@@ -59,3 +59,7 @@ bool PipelinedCPU::done() const {
     // passed last_instruction_addr AND all 4 pipeline registers are invalid.
     return false;
 }
+
+const uint32_t* PipelinedCPU::get_registers() const{
+    return registers;
+}
