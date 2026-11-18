@@ -1,6 +1,7 @@
 #include "cpu/cpu.hpp"
 #include "cpu/memory.hpp"
 #include "cpu/cache.hpp"
+#include "cpu/pipelined_cpu.hpp"
 #include <iostream>
 
 constexpr uint64_t HIT_COST = 1;
@@ -37,20 +38,28 @@ void printTotalCycleCost(ICache& icache, DCache& dcache) {
     std::cout << "total cycle cost: " << (icache_cycles + dcache_cycles) << "\n";
 }
 
-int main() {
-    Memory memory;
-    memory.loadProgram("tests/riscv_test_program_1.hex");
-
-    DCache dcache(memory);
-    ICache icache(memory);
-
-    CPU cpu(memory, dcache, icache);
-    cpu.run();
-
+void cache_stats_output(DCache& dcache, ICache& icache){
     printCacheStats("icache", icache);
     printCacheStats("dcache", dcache);
     std::cout << "dcache: dirty_misses=" << dcache.getDirtyMissCount() << "\n";
     printTotalCycleCost(icache, dcache);
+}
 
+int main() {
+    Memory memory;
+    memory.loadProgram("tests/riscv_test_program_1.hex");
+    DCache dcache(memory);
+    ICache icache(memory);
+    CPU cpu(memory, dcache, icache);
+    cpu.run();
+
+    cache_stats_output(dcache, icache);    
+
+    Memory p_memory;
+    p_memory.loadProgram("tests/riscv_test_program_1.hex");
+    DCache p_dcache(p_memory);
+    ICache p_icache(p_icache);
+    PipelinedCPU p_cpu(p_memory, p_dcache, p_icache);
+    p_cpu.run();
     return 0;
 }
