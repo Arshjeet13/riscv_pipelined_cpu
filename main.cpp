@@ -2,6 +2,7 @@
 #include "cpu/memory.hpp"
 #include "cpu/cache.hpp"
 #include "cpu/pipelined_cpu.hpp"
+#include "compare_tool.hpp"
 #include <iostream>
 
 constexpr uint64_t HIT_COST = 1;
@@ -58,8 +59,17 @@ int main() {
     Memory p_memory;
     p_memory.loadProgram("tests/riscv_test_program_1.hex");
     DCache p_dcache(p_memory);
-    ICache p_icache(p_icache);
+    ICache p_icache(p_memory);
     PipelinedCPU p_cpu(p_memory, p_dcache, p_icache);
     p_cpu.run();
+
+    bool states_match = compare(cpu, memory, p_cpu, p_memory);
+
+    if(states_match){
+        std::cout << "Pipelined CPU correct\n";
+    }
+    else{
+        std::cout << "Pipelined CPU wrong\n";
+    }
     return 0;
 }
